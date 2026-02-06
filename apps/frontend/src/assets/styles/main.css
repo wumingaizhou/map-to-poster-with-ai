@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+/* TailwindCSS v4 (CSS-first): explicit source scanning */
+@source "../../**/*.{vue,ts,tsx,js,jsx}";
+@source "../../../index.html";
+
+/* Project style modules */
+@import "./theme.tokens.css";
+@import "./base.css";
+@import "./components.css";
+@import "./utilities.css";

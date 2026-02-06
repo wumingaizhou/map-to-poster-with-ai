@@ -1,0 +1,57 @@
+{
+  "kind": "aiThemeOverride",
+  "version": 1,
+  "baseThemeId": "system-buildings-v1",
+  "palette": {
+    "bg": "#FAFAF9",
+    "text": "#111827",
+    "gradient": "#FAFAF9",
+    "waterFill": "#E0F2FE",
+    "waterStroke": "#93C5FD",
+    "parkFill": "#DCFCE7",
+    "parkStroke": "#86EFAC",
+    "buildingFill": "#111827",
+    "buildingStroke": "#111827",
+    "roadMajor": "#111827",
+    "roadMedium": "#4B5563",
+    "roadMinor": "#9CA3AF",
+    "roadCasing": "#FAFAF9"
+  },
+  "tuning": {
+    "gradientFades": {
+      "enabled": true,
+      "heightPct": 0.06
+    },
+    "layerOpacities": {
+      "water": 0.25,
+      "parks": 0.25,
+      "buildings": 0.16
+    },
+    "roads": {
+      "casing": {
+        "enabled": false,
+        "strokeWidthAddPt": 0.6,
+        "opacity": 1
+      },
+      "major": {
+        "strokeWidthPt": 0.8,
+        "opacity": 0.5
+      },
+      "medium": {
+        "strokeWidthPt": 0.6,
+        "opacity": 0.35
+      },
+      "minor": {
+        "strokeWidthPt": 0.35,
+        "opacity": 0.25
+      }
+    }
+  },
+  "typography": {
+    "fontFamily": "ma-shan-zheng",
+    "preset": "bottom",
+    "titleColor": "#111827",
+    "subtitleColor": "#111827",
+    "coordsColor": "#111827"
+  }
+}

@@ -1,0 +1,84 @@
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html,
+  body,
+  #app {
+    height: 100%;
+  }
+
+  html {
+    /* Prevent iOS text size adjustment on orientation change */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-bg);
+    color: var(--color-fg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Prevent pull-to-refresh on mobile when app has its own scroll */
+    overscroll-behavior-y: contain;
+    /* Prevent long-press context menu and text selection on interactive elements */
+    -webkit-touch-callout: none;
+  }
+
+  /* Optimize touch interactions for buttons and interactive elements */
+  button,
+  [role="button"],
+  a,
+  input,
+  select,
+  textarea {
+    /* Allow default text selection behavior for inputs */
+    -webkit-touch-callout: default;
+    /* Eliminate 300ms tap delay on mobile */
+    touch-action: manipulation;
+  }
+
+  /* Global Scrollbar Styles */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-strong) transparent;
+  }
+
+  /* WebKit (Chrome, Safari, Edge) */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-border-strong);
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-muted-subtle);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html:focus-within {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

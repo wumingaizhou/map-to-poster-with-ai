@@ -1,0 +1,46 @@
+{
+  "name": "@map-to-poster-with-ai/frontend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "run-p type-check \"build-only {@}\" --",
+    "preview": "vite preview",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --build"
+  },
+  "dependencies": {
+    "@panzoom/panzoom": "^4.6.1",
+    "@tailwindcss/vite": "^4.1.17",
+    "file-saver": "^2.0.5",
+    "markstream-vue": "0.0.7-beta.5",
+    "photoswipe": "^5.4.4",
+    "pinia": "^3.0.4",
+    "rollup-plugin-visualizer": "^6.0.5",
+    "tailwindcss": "^4.1.17",
+    "uuid": "^13.0.0",
+    "vite-plugin-compression": "^0.5.1",
+    "vue": "^3.5.27",
+    "vue-router": "^5.0.2",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@tsconfig/node24": "^24.0.4",
+    "@types/file-saver": "^2.0.7",
+    "@types/node": "^25.2.0",
+    "@vitejs/plugin-vue": "^6.0.4",
+    "@vue/tsconfig": "^0.8.1",
+    "naive-ui": "^2.43.2",
+    "npm-run-all2": "^8.0.4",
+    "typescript": "~5.9.0",
+    "unplugin-auto-import": "^21.0.0",
+    "unplugin-vue-components": "^31.0.0",
+    "vite": "^7.3.1",
+    "vite-plugin-vue-devtools": "^8.0.6",
+    "vue-tsc": "^3.2.2"
+  }
+}

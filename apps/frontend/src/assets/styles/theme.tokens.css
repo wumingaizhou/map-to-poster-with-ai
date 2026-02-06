@@ -1,0 +1,121 @@
+@layer theme {
+  :root {
+    /* Semantic color tokens - minimal white/black design palette */
+    --app-color-bg: #ffffff;
+    --app-color-bg-accent: #fafafa;
+    --app-color-canvas: #ffffff;
+
+    --app-color-surface: #ffffff;
+    --app-color-surface-elevated: #ffffff;
+    --app-color-surface-muted: #fafafa;
+    --app-color-surface-subtle: #f5f5f5;
+
+    --app-color-fg: #0a0a0a;
+    --app-color-muted: #737373;
+    --app-color-muted-strong: #525252;
+    --app-color-muted-subtle: #a3a3a3;
+
+    --app-color-border: #e5e5e5;
+    --app-color-border-strong: #d4d4d4;
+
+    /* Primary = black for actions/focus (no brand color) */
+    --app-color-primary: #0a0a0a;
+    --app-color-primary-hover: #262626;
+    --app-color-primary-subtle: #f5f5f5;
+
+    /* Info remains blue for informational states */
+    --app-color-info: #3b82f6;
+    --app-color-info-hover: #2563eb;
+    --app-color-info-subtle: #eff6ff;
+
+    --app-color-success: #10b981;
+
+    /* Typography */
+    --app-font-display: "Lora", Georgia, serif;
+    --app-font-sans: "Inter", system-ui, sans-serif;
+
+    /* Radii (minimalist) */
+    --app-radius-sm: 2px;
+    --app-radius-md: 4px;
+    --app-radius-lg: 6px;
+    --app-radius-xl: 8px;
+    --app-radius-2xl: 10px;
+
+    /* Layout tokens */
+    --app-layout-sidebar-width: 320px;
+    --app-layout-right-panel-width: 20rem;
+    /* ~= w-80 */
+    --app-layout-right-panel-width-lg: 24rem;
+    /* ~= w-96 */
+    --app-layout-right-panel-width-xl: 30rem;
+    /* ~= old w-100 */
+    --app-layout-topbar-height: 56px;
+    --app-layout-bottombar-height: 36px;
+
+    --app-layout-mobile-topbar-height: 48px;
+    --app-layout-mobile-drawer-width: 85vw;
+    --app-layout-mobile-drawer-max-width: 340px;
+    --app-layout-mobile-drawer-max-width-right: 400px;
+
+    /* Z-index scale */
+    --app-z-map-ui: 1000;
+    --app-z-overlay: 9998;
+    --app-z-modal: 9999;
+    --app-z-popover: 10000;
+
+    /* Glass effect tuning */
+    --app-glass-blur: 12px;
+    --app-glass-blur-strong: 16px;
+    --app-glass-surface-alpha: 0.94;
+    --app-glass-surface-alpha-strong: 0.98;
+    --app-glass-border-alpha: 0.06;
+    --app-glass-border-alpha-strong: 0.08;
+
+    /* Shadows (used by semantic component classes) */
+    --app-shadow-glass: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  }
+
+  @theme {
+    /* Colors */
+    --color-bg: var(--app-color-bg);
+    --color-bg-accent: var(--app-color-bg-accent);
+    --color-canvas: var(--app-color-canvas);
+
+    --color-surface: var(--app-color-surface);
+    --color-surface-elevated: var(--app-color-surface-elevated);
+    --color-surface-muted: var(--app-color-surface-muted);
+    --color-surface-subtle: var(--app-color-surface-subtle);
+
+    --color-fg: var(--app-color-fg);
+    --color-muted: var(--app-color-muted);
+    --color-muted-strong: var(--app-color-muted-strong);
+    --color-muted-subtle: var(--app-color-muted-subtle);
+
+    --color-border: var(--app-color-border);
+    --color-border-strong: var(--app-color-border-strong);
+
+    --color-primary: var(--app-color-primary);
+    --color-primary-hover: var(--app-color-primary-hover);
+    --color-primary-subtle: var(--app-color-primary-subtle);
+
+    --color-info: var(--app-color-info);
+    --color-info-hover: var(--app-color-info-hover);
+    --color-info-subtle: var(--app-color-info-subtle);
+
+    --color-success: var(--app-color-success);
+
+    /* Fonts */
+    --font-display: var(--app-font-display);
+    --font-sans: var(--app-font-sans);
+
+    /* Radii */
+    --radius-sm: var(--app-radius-sm);
+    --radius-md: var(--app-radius-md);
+    --radius-lg: var(--app-radius-lg);
+    --radius-xl: var(--app-radius-xl);
+    --radius-2xl: var(--app-radius-2xl);
+
+    /* Shadows */
+    --shadow-glass: var(--app-shadow-glass);
+  }
+}

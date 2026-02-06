@@ -1,0 +1,111 @@
+@layer utilities {
+  .page-root {
+    width: 100%;
+    height: 100%;
+  }
+
+  .page-fade-enter-active {
+    transition: opacity 200ms ease-out;
+  }
+
+  .page-fade-leave-active {
+    transition: opacity 150ms ease-in;
+  }
+
+  .page-fade-enter-from,
+  .page-fade-leave-to {
+    opacity: 0;
+  }
+
+  .z-map-ui {
+    z-index: var(--app-z-map-ui);
+  }
+
+  .z-overlay {
+    z-index: var(--app-z-overlay);
+  }
+
+  .z-modal {
+    z-index: var(--app-z-modal);
+  }
+
+  .z-popover {
+    z-index: var(--app-z-popover);
+  }
+
+  .transition-collapse {
+    transition-property: grid-template-rows, opacity;
+    transition-duration: 500ms;
+    transition-timing-function: ease-out;
+  }
+
+  @supports (padding-top: env(safe-area-inset-top)) {
+    .safe-area-top {
+      padding-top: env(safe-area-inset-top);
+    }
+
+    .safe-area-bottom {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .safe-area-left {
+      padding-left: env(safe-area-inset-left);
+    }
+
+    .safe-area-right {
+      padding-right: env(safe-area-inset-right);
+    }
+
+    .safe-area-x {
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+
+    .safe-area-y {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+  }
+
+  /* Touch-friendly tap targets (WCAG 2.5.5 minimum 44x44px) */
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Focus visible for keyboard navigation */
+  .focus-visible-ring:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* Smooth scroll for containers (adds iOS momentum scrolling) */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Scrollbar styling: opt-in for scrollable sub-containers */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-strong) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--color-border-strong);
+    border-radius: 9999px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-muted-subtle);
+  }
+}

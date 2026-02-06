@@ -1,0 +1,57 @@
+{
+  "kind": "aiThemeOverride",
+  "version": 1,
+  "baseThemeId": "system-water-v1",
+  "palette": {
+    "bg": "#F7FBFF",
+    "text": "#0B1F3B",
+    "gradient": "#F7FBFF",
+    "waterFill": "#0B3D91",
+    "waterStroke": "#062B66",
+    "parkFill": "#D1FAE5",
+    "parkStroke": "#A7F3D0",
+    "buildingFill": "#94A3B8",
+    "buildingStroke": "#64748B",
+    "roadMajor": "#0B1F3B",
+    "roadMedium": "#1E3A8A",
+    "roadMinor": "#6B92C7",
+    "roadCasing": "#F7FBFF"
+  },
+  "tuning": {
+    "gradientFades": {
+      "enabled": true,
+      "heightPct": 0.06
+    },
+    "layerOpacities": {
+      "water": 0.9,
+      "parks": 0.18,
+      "buildings": 0.06
+    },
+    "roads": {
+      "casing": {
+        "enabled": false,
+        "strokeWidthAddPt": 0.6,
+        "opacity": 1
+      },
+      "major": {
+        "strokeWidthPt": 1,
+        "opacity": 0.4
+      },
+      "medium": {
+        "strokeWidthPt": 0.7,
+        "opacity": 0.3
+      },
+      "minor": {
+        "strokeWidthPt": 0.35,
+        "opacity": 0.22
+      }
+    }
+  },
+  "typography": {
+    "fontFamily": "ma-shan-zheng",
+    "preset": "bottom",
+    "titleColor": "#0B1F3B",
+    "subtitleColor": "#0B1F3B",
+    "coordsColor": "#0B1F3B"
+  }
+}

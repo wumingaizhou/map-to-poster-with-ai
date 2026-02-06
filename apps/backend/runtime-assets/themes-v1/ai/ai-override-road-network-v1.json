@@ -1,0 +1,57 @@
+{
+  "kind": "aiThemeOverride",
+  "version": 1,
+  "baseThemeId": "system-roadNetwork-v1",
+  "palette": {
+    "bg": "#FFFFFF",
+    "text": "#111827",
+    "gradient": "#FFFFFF",
+    "waterFill": "#D1D5DB",
+    "waterStroke": "#9CA3AF",
+    "parkFill": "#E5E7EB",
+    "parkStroke": "#CBD5E1",
+    "buildingFill": "#9CA3AF",
+    "buildingStroke": "#6B7280",
+    "roadMajor": "#111827",
+    "roadMedium": "#374151",
+    "roadMinor": "#6B7280",
+    "roadCasing": "#FFFFFF"
+  },
+  "tuning": {
+    "gradientFades": {
+      "enabled": true,
+      "heightPct": 0.06
+    },
+    "layerOpacities": {
+      "water": 1,
+      "parks": 1,
+      "buildings": 0.12
+    },
+    "roads": {
+      "casing": {
+        "enabled": false,
+        "strokeWidthAddPt": 0.6,
+        "opacity": 1
+      },
+      "major": {
+        "strokeWidthPt": 1.2,
+        "opacity": 1
+      },
+      "medium": {
+        "strokeWidthPt": 0.8,
+        "opacity": 0.85
+      },
+      "minor": {
+        "strokeWidthPt": 0.4,
+        "opacity": 0.7
+      }
+    }
+  },
+  "typography": {
+    "fontFamily": "ma-shan-zheng",
+    "preset": "bottom",
+    "titleColor": "#111827",
+    "subtitleColor": "#111827",
+    "coordsColor": "#111827"
+  }
+}

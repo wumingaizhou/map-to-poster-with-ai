@@ -1,0 +1,57 @@
+{
+  "kind": "aiThemeOverride",
+  "version": 1,
+  "baseThemeId": "system-greenSpaces-v1",
+  "palette": {
+    "bg": "#F6FBF4",
+    "text": "#0F172A",
+    "gradient": "#F6FBF4",
+    "waterFill": "#B9D7EA",
+    "waterStroke": "#8BBBD6",
+    "parkFill": "#2F855A",
+    "parkStroke": "#276749",
+    "buildingFill": "#94A3B8",
+    "buildingStroke": "#64748B",
+    "roadMajor": "#0F172A",
+    "roadMedium": "#334155",
+    "roadMinor": "#64748B",
+    "roadCasing": "#F6FBF4"
+  },
+  "tuning": {
+    "gradientFades": {
+      "enabled": true,
+      "heightPct": 0.06
+    },
+    "layerOpacities": {
+      "water": 0.6,
+      "parks": 0.85,
+      "buildings": 0.05
+    },
+    "roads": {
+      "casing": {
+        "enabled": false,
+        "strokeWidthAddPt": 0.6,
+        "opacity": 1
+      },
+      "major": {
+        "strokeWidthPt": 0.9,
+        "opacity": 0.45
+      },
+      "medium": {
+        "strokeWidthPt": 0.6,
+        "opacity": 0.35
+      },
+      "minor": {
+        "strokeWidthPt": 0.3,
+        "opacity": 0.25
+      }
+    }
+  },
+  "typography": {
+    "fontFamily": "ma-shan-zheng",
+    "preset": "bottom",
+    "titleColor": "#0F172A",
+    "subtitleColor": "#0F172A",
+    "coordsColor": "#0F172A"
+  }
+}

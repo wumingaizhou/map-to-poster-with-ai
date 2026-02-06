@@ -1,0 +1,66 @@
+# .gitignore
+# Node
+node_modules/
+dist/
+build/
+.env
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+
+# Frontend generated types / reports
+apps/frontend/src/auto-imports.d.ts
+apps/frontend/src/components.d.ts
+apps/frontend/stats.json
+
+# Misc
+coverage/
+*.local
+*.cache
+*.tmp
+
+# Git
+.git/
+
+# mastra-memory
+mastra-memory/
+.mastra/
+
+# tiff
+*.tif
+
+# claude
+.claude/
+
+# python
+__pycache__/
+.venv/
+
+# vibe coding
+.codex/
+openspec/
+
+# backend artifacts
+apps/backend/poster-assets/
+apps/backend/__test__/artifacts/
+osm-cache.db
+poster-worker.dev.mjs
+poster-worker.dev.mjs.map

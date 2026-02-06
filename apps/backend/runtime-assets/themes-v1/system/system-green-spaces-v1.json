@@ -1,0 +1,242 @@
+{
+  "kind": "posterTheme",
+  "version": 1,
+  "id": "system-greenSpaces-v1",
+  "name": "Green Spaces (Emerald)",
+  "description": "Parks-first styling with subtle roads and water.",
+  "category": "greenSpaces",
+  "page": {
+    "widthIn": 12,
+    "heightIn": 16,
+    "unit": "pt",
+    "viewBox": {
+      "x": 0,
+      "y": 0,
+      "width": 864,
+      "height": 1152
+    }
+  },
+  "palette": {
+    "bg": "#F6FBF4",
+    "text": "#0F172A",
+    "gradient": "#F6FBF4",
+    "waterFill": "#B9D7EA",
+    "waterStroke": "#8BBBD6",
+    "parkFill": "#2F855A",
+    "parkStroke": "#276749",
+    "buildingFill": "#94A3B8",
+    "buildingStroke": "#64748B",
+    "roadMajor": "#0F172A",
+    "roadMedium": "#334155",
+    "roadMinor": "#64748B",
+    "roadCasing": "#F6FBF4"
+  },
+  "background": {
+    "fill": "$bg"
+  },
+  "effects": {
+    "gradientFades": {
+      "enabled": true,
+      "zIndex": 90,
+      "color": "$gradient",
+      "top": {
+        "heightPct": 0.06,
+        "fromOpacity": 1,
+        "toOpacity": 0
+      },
+      "bottom": {
+        "heightPct": 0.06,
+        "fromOpacity": 1,
+        "toOpacity": 0
+      }
+    }
+  },
+  "layers": {
+    "water": {
+      "enabled": true,
+      "zIndex": 10,
+      "polygon": {
+        "fill": "$waterFill",
+        "fillOpacity": 0.6,
+        "stroke": "$waterStroke",
+        "strokeOpacity": 0.35,
+        "strokeWidthPt": 0.4
+      }
+    },
+    "parks": {
+      "enabled": true,
+      "zIndex": 20,
+      "polygon": {
+        "fill": "$parkFill",
+        "fillOpacity": 0.85,
+        "stroke": "$parkStroke",
+        "strokeOpacity": 0.25,
+        "strokeWidthPt": 0.3
+      }
+    },
+    "buildings": {
+      "enabled": true,
+      "zIndex": 30,
+      "polygon": {
+        "fill": "$buildingFill",
+        "fillOpacity": 0.05,
+        "stroke": "$buildingStroke",
+        "strokeOpacity": 0.08,
+        "strokeWidthPt": 0.2
+      }
+    },
+    "roads": {
+      "enabled": true,
+      "zIndex": 40,
+      "lineCap": "round",
+      "lineJoin": "round",
+      "casing": {
+        "enabled": false,
+        "stroke": "$roadCasing",
+        "strokeWidthAddPt": 0.6,
+        "opacity": 1
+      },
+      "classes": {
+        "major": {
+          "stroke": "$roadMajor",
+          "strokeWidthPt": 0.9,
+          "opacity": 0.45
+        },
+        "medium": {
+          "stroke": "$roadMedium",
+          "strokeWidthPt": 0.6,
+          "opacity": 0.35
+        },
+        "minor": {
+          "stroke": "$roadMinor",
+          "strokeWidthPt": 0.3,
+          "opacity": 0.25
+        }
+      },
+      "mapping": {
+        "motorway": "major",
+        "motorway_link": "major",
+        "trunk": "major",
+        "trunk_link": "major",
+        "primary": "major",
+        "primary_link": "major",
+        "secondary": "medium",
+        "secondary_link": "medium",
+        "tertiary": "minor",
+        "tertiary_link": "minor",
+        "residential": "minor",
+        "living_street": "minor",
+        "unclassified": "minor",
+        "service": "minor"
+      },
+      "defaultClass": "minor"
+    }
+  },
+  "typography": {
+    "fontFamily": "ma-shan-zheng",
+    "preset": "bottom",
+    "blocks": {
+      "title": {
+        "enabled": true,
+        "fontWeight": 700,
+        "fontSizePt": 60,
+        "letterSpacingPt": 6,
+        "transform": "uppercase",
+        "color": "$text",
+        "opacity": 1
+      },
+      "subtitle": {
+        "enabled": true,
+        "fontWeight": 300,
+        "fontSizePt": 22,
+        "letterSpacingPt": 2,
+        "transform": "uppercase",
+        "color": "$text",
+        "opacity": 1
+      },
+      "coords": {
+        "enabled": true,
+        "fontWeight": 400,
+        "fontSizePt": 14,
+        "transform": "none",
+        "color": "$text",
+        "opacity": 0.7
+      },
+      "attribution": {
+        "enabled": true,
+        "fontWeight": 300,
+        "fontSizePt": 8,
+        "transform": "none",
+        "color": "$text",
+        "opacity": 0.5
+      }
+    },
+    "layouts": {
+      "bottom": {
+        "title": {
+          "xPct": 0.5,
+          "yPct": 0.14,
+          "anchor": "middle"
+        },
+        "subtitle": {
+          "xPct": 0.5,
+          "yPct": 0.1,
+          "anchor": "middle"
+        },
+        "coords": {
+          "xPct": 0.5,
+          "yPct": 0.07,
+          "anchor": "middle"
+        },
+        "attribution": {
+          "xPct": 0.98,
+          "yPct": 0.02,
+          "anchor": "end"
+        }
+      },
+      "top": {
+        "title": {
+          "xPct": 0.5,
+          "yPct": 0.88,
+          "anchor": "middle"
+        },
+        "subtitle": {
+          "xPct": 0.5,
+          "yPct": 0.84,
+          "anchor": "middle"
+        },
+        "coords": {
+          "xPct": 0.5,
+          "yPct": 0.81,
+          "anchor": "middle"
+        },
+        "attribution": {
+          "xPct": 0.98,
+          "yPct": 0.02,
+          "anchor": "end"
+        }
+      }
+    }
+  },
+  "decorations": {
+    "divider": {
+      "enabled": true,
+      "zIndex": 95,
+      "stroke": "$text",
+      "strokeOpacity": 1,
+      "strokeWidthPt": 1,
+      "layouts": {
+        "bottom": {
+          "x1Pct": 0.4,
+          "x2Pct": 0.6,
+          "yPct": 0.125
+        },
+        "top": {
+          "x1Pct": 0.4,
+          "x2Pct": 0.6,
+          "yPct": 0.865
+        }
+      }
+    }
+  }
+}
