@@ -31,6 +31,7 @@
     "mastra": "1.2.0",
     "osmtogeojson": "3.0.0-beta.5",
     "pino": "^10.2.1",
+    "sharp": "^0.34.5",
     "zod": "^3.25.76"
   },
   "devDependencies": {

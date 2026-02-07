@@ -6,6 +6,7 @@ import type { PosterAssetStore } from "../infra/posters/poster-asset-store";
 import type { CreatePosterSessionParams, PosterSessionStore } from "../infra/posters/poster-session-store";
 import { KeyedLock } from "../infra/posters/keyed-lock";
 import type { PosterWorkerPool } from "../infra/posters/poster-worker-pool";
+import { generatePreviewWebp } from "../infra/posters/png-to-preview";
 import { ThemeOverrideService } from "./theme-override-service";
 export type CreatePosterSessionRequestDTO = {
   locationQuery: string;
@@ -38,8 +39,12 @@ export type ListPosterVersionsResponseDTO = {
   latestVersionId: string;
 };
 export type DownloadPosterPngResult = {
-  png: Buffer;
+  filePath: string;
+  fileSize: number;
   fileName: string;
+};
+export type DownloadPosterPreviewResult = {
+  preview: Buffer;
 };
 export type IteratePosterStyleResponseDTO = {
   newVersion: {
@@ -110,7 +115,24 @@ export class PostersService {
           versionId: latestVersion.versionId,
           png
         });
+        const preview = await generatePreviewWebp(png);
+        await this.assetStore.writePreview({
+          resourceId,
+          sessionId: session.sessionId,
+          versionId: latestVersion.versionId,
+          preview
+        });
       } catch (error) {
+        await this.assetStore.deletePng({
+          resourceId,
+          sessionId: session.sessionId,
+          versionId: latestVersion.versionId
+        });
+        await this.assetStore.deletePreview({
+          resourceId,
+          sessionId: session.sessionId,
+          versionId: latestVersion.versionId
+        });
         await this.sessionStore.deleteSession(resourceId, session.sessionId);
         throw error;
       }
@@ -162,8 +184,16 @@ export class PostersService {
           versionId,
           png
         });
+        const preview = await generatePreviewWebp(png);
+        await this.assetStore.writePreview({
+          resourceId,
+          sessionId: session.sessionId,
+          versionId,
+          preview
+        });
       } catch (error) {
         await this.assetStore.deletePng({ resourceId, sessionId: session.sessionId, versionId });
+        await this.assetStore.deletePreview({ resourceId, sessionId: session.sessionId, versionId });
         throw error;
       }
       try {
@@ -180,19 +210,29 @@ export class PostersService {
         };
       } catch (error) {
         await this.assetStore.deletePng({ resourceId, sessionId: session.sessionId, versionId });
+        await this.assetStore.deletePreview({ resourceId, sessionId: session.sessionId, versionId });
         throw error;
       }
     });
   }
   async downloadPng(resourceId: string, versionId: string): Promise<DownloadPosterPngResult> {
     const { session, version } = await this.sessionStore.getVersion(resourceId, versionId);
-    const png = await this.assetStore.readPng({
+    const pngStat = await this.assetStore.statPng({
       resourceId,
       sessionId: session.sessionId,
       versionId: version.versionId
     });
     const fileName = `${session.category}_${toEpochMsOrNow(version.createdAt)}.png`;
-    return { png, fileName };
+    return { filePath: pngStat.filePath, fileSize: pngStat.size, fileName };
+  }
+  async downloadPreview(resourceId: string, versionId: string): Promise<DownloadPosterPreviewResult> {
+    const { session, version } = await this.sessionStore.getVersion(resourceId, versionId);
+    const preview = await this.assetStore.readPreview({
+      resourceId,
+      sessionId: session.sessionId,
+      versionId: version.versionId
+    });
+    return { preview };
   }
   async deleteVersion(resourceId: string, sessionId: string, versionId: string): Promise<void> {
     const list = await this.sessionStore.listSessionVersions(resourceId, sessionId);
@@ -209,5 +249,6 @@ export class PostersService {
     }
     await this.sessionStore.deleteVersion(resourceId, sessionId, versionId);
     await this.assetStore.deletePng({ resourceId, sessionId, versionId });
+    await this.assetStore.deletePreview({ resourceId, sessionId, versionId });
   }
 }

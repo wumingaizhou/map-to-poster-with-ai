@@ -359,14 +359,6 @@ export class AiChatService extends BaseService {
   }
   private isAllowedSseEvent(eventType: unknown): boolean {
     if (typeof eventType !== "string") return false;
-    return (
-      eventType === "start" ||
-      eventType === "step-start" ||
-      eventType === "step-finish" ||
-      eventType === "tool-call" ||
-      eventType === "tool-result" ||
-      eventType === "finish" ||
-      eventType === "error"
-    );
+    return eventType === "start" || eventType === "tool-call" || eventType === "tool-result" || eventType === "error";
   }
 }

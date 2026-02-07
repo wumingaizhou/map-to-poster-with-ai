@@ -42,7 +42,7 @@ async function loadPreview(): Promise<void> {
 
   try {
     const result = await acquirePosterPreviewObjectUrl(props.versionId, async () => {
-      const { blob } = await posterAlphaService.downloadPngBlob(props.versionId);
+      const { blob } = await posterAlphaService.downloadPreviewBlob(props.versionId);
       return blob;
     });
 
@@ -143,7 +143,7 @@ async function openLightbox(): Promise<void> {
 
   // Lightbox 打开期间也持有一份引用，避免 URL 被回收
   const lightboxRef = await acquirePosterPreviewObjectUrl(props.versionId, async () => {
-    const { blob } = await posterAlphaService.downloadPngBlob(props.versionId);
+    const { blob } = await posterAlphaService.downloadPreviewBlob(props.versionId);
     return blob;
   });
 

@@ -87,6 +87,9 @@ export class App {
           if (typeof req.path === "string" && req.path.endsWith("/ai-chat/stream")) {
             return false;
           }
+          if (contentType.includes("image/png") || contentType.includes("image/webp")) {
+            return false;
+          }
           return compression.filter(req, res);
         }
       })

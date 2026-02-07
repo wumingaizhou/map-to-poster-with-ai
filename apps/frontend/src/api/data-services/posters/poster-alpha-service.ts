@@ -73,6 +73,13 @@ export class PosterAlphaService extends DataService {
       throw this.toBusinessError(error, { operation: "downloadPngBlob", metadata: { versionId } });
     }
   }
+  async downloadPreviewBlob(versionId: string, options?: { signal?: AbortSignal }): Promise<{ blob: Blob }> {
+    try {
+      return await this.postersResource.downloadPreviewBlob(versionId, options);
+    } catch (error) {
+      throw this.toBusinessError(error, { operation: "downloadPreviewBlob", metadata: { versionId } });
+    }
+  }
   protected override mapToDomainError(error: unknown, context?: ErrorContext): BusinessError | null {
     if (error instanceof Error) {
       return this.unexpected(`[posters] ${context?.operation ?? "operation"} failed: ${error.message}`, error);

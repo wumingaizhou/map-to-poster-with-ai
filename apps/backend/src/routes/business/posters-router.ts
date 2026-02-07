@@ -5,6 +5,7 @@ import {
   createPosterSessionSchema,
   deletePosterVersionSchema,
   downloadPosterPngSchema,
+  downloadPosterPreviewSchema,
   listPosterVersionsSchema
 } from "../../schemas/posters-schemas";
 import { PostersController } from "../../controllers/business/posters-controller";
@@ -21,6 +22,12 @@ export class PostersRouter extends BaseRouter {
     );
     this.router.get("/versions/:versionId/assets/png", jwtAuth(), validate(downloadPosterPngSchema), (req, res) =>
       this.controller.downloadPng(req, res)
+    );
+    this.router.get(
+      "/versions/:versionId/assets/preview",
+      jwtAuth(),
+      validate(downloadPosterPreviewSchema),
+      (req, res) => this.controller.downloadPreview(req, res)
     );
     this.router.delete(
       "/sessions/:sessionId/versions/:versionId",

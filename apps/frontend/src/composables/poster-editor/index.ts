@@ -1,5 +1,4 @@
 export { useVersionManager, type SessionMeta } from "./use-version-manager";
-export { usePreviewManager } from "./use-preview-manager";
 export { useDownloadManager } from "./use-download-manager";
 export { usePanzoom, watchPanzoomInit, type UsePanzoomOptions, type UsePanzoomReturn } from "./use-panzoom";
 export {

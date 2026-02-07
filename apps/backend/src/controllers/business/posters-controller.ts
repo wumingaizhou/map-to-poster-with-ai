@@ -1,11 +1,18 @@
 import type { Request, Response } from "express";
+import { createReadStream } from "fs";
+import { pipeline } from "stream/promises";
 import { BaseController } from "../base/base-controller";
 import { CreatePosterSessionUseCase } from "../../usecases/business/posters/create-poster-session-usecase";
 import { ListPosterVersionsUseCase } from "../../usecases/business/posters/list-poster-versions-usecase";
 import { DownloadPosterPngUseCase } from "../../usecases/business/posters/download-poster-png-usecase";
+import { DownloadPosterPreviewUseCase } from "../../usecases/business/posters/download-poster-preview-usecase";
 import { DeletePosterVersionUseCase } from "../../usecases/business/posters/delete-poster-version-usecase";
+import { NotFoundError } from "../../errors/app-error";
 import type { PosterCategory } from "../../types/posters/poster-category";
 import type { BBox } from "../../services/infra/osm/bbox";
+function isErrnoLike(error: unknown): error is NodeJS.ErrnoException {
+  return typeof error === "object" && error !== null && "code" in error;
+}
 function buildContentDisposition(fileName: string): string {
   const encoded = encodeURIComponent(fileName)
     .replaceAll("'", "%27")
@@ -28,6 +35,7 @@ export class PostersController extends BaseController {
     private readonly createPosterSessionUseCase: CreatePosterSessionUseCase,
     private readonly listPosterVersionsUseCase: ListPosterVersionsUseCase,
     private readonly downloadPosterPngUseCase: DownloadPosterPngUseCase,
+    private readonly downloadPosterPreviewUseCase: DownloadPosterPreviewUseCase,
     private readonly deletePosterVersionUseCase: DeletePosterVersionUseCase
   ) {
     super("PostersController");
@@ -55,14 +63,49 @@ export class PostersController extends BaseController {
     res.setHeader("Cache-Control", "no-store");
     return this.success(res, result);
   }
-  async downloadPng(req: Request, res: Response): Promise<Response> {
+  async downloadPng(req: Request, res: Response): Promise<void> {
     const resourceId = req.auth?.resourceId ?? "";
     const versionId = (req.params as { versionId: string }).versionId;
     const result = await this.downloadPosterPngUseCase.execute({ resourceId, versionId });
     res.setHeader("Content-Type", "image/png");
     res.setHeader("Content-Disposition", buildContentDisposition(result.fileName));
-    res.setHeader("Cache-Control", "no-store");
-    return res.status(200).send(result.png);
+    res.setHeader("Cache-Control", "private, max-age=86400, immutable");
+    res.vary("Authorization");
+    res.setHeader("Content-Length", result.fileSize);
+    res.status(200);
+    const stream = createReadStream(result.filePath);
+    try {
+      await pipeline(stream, res);
+    } catch (error) {
+      const code = isErrnoLike(error) ? error.code : undefined;
+      if (req.aborted || res.destroyed || code === "ERR_STREAM_PREMATURE_CLOSE" || code === "ECONNRESET") {
+        return;
+      }
+      this.logError("Failed to stream PNG asset", error);
+      if (res.headersSent) {
+        res.destroy();
+        return;
+      }
+      res.removeHeader("Content-Disposition");
+      res.removeHeader("Content-Length");
+      res.removeHeader("Content-Type");
+      res.removeHeader("Cache-Control");
+      res.removeHeader("Vary");
+      res.setHeader("Cache-Control", "no-store");
+      if (code === "ENOENT") {
+        throw new NotFoundError("PNG asset not found");
+      }
+      throw error instanceof Error ? error : new Error("Failed to stream PNG asset");
+    }
+  }
+  async downloadPreview(req: Request, res: Response): Promise<Response> {
+    const resourceId = req.auth?.resourceId ?? "";
+    const versionId = (req.params as { versionId: string }).versionId;
+    const result = await this.downloadPosterPreviewUseCase.execute({ resourceId, versionId });
+    res.setHeader("Content-Type", "image/webp");
+    res.setHeader("Cache-Control", "private, max-age=86400, immutable");
+    res.vary("Authorization");
+    return res.status(200).send(result.preview);
   }
   async deleteVersion(req: Request, res: Response): Promise<Response> {
     const resourceId = req.auth?.resourceId ?? "";

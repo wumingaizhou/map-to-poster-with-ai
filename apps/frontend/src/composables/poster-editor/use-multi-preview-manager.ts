@@ -21,7 +21,7 @@ export function useMultiPreviewManager(): UseMultiPreviewManagerReturn {
       await Promise.all(
         toLoad.map(async v => {
           try {
-            const { blob } = await posterAlphaService.downloadPngBlob(v.versionId);
+            const { blob } = await posterAlphaService.downloadPreviewBlob(v.versionId);
             const url = URL.createObjectURL(blob);
             previews.value.set(v.versionId, url);
           } catch (err) {

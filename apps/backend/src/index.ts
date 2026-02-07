@@ -14,6 +14,7 @@ import { GeocodeUseCase } from "./usecases/business/geocode/geocode-usecase";
 import { CreatePosterSessionUseCase } from "./usecases/business/posters/create-poster-session-usecase";
 import { ListPosterVersionsUseCase } from "./usecases/business/posters/list-poster-versions-usecase";
 import { DownloadPosterPngUseCase } from "./usecases/business/posters/download-poster-png-usecase";
+import { DownloadPosterPreviewUseCase } from "./usecases/business/posters/download-poster-preview-usecase";
 import { DeletePosterVersionUseCase } from "./usecases/business/posters/delete-poster-version-usecase";
 import { AuthController } from "./controllers/business/auth-controller";
 import { AiChatController } from "./controllers/business/ai-chat-controller";
@@ -61,11 +62,13 @@ function createPostersRouter(postersService: PostersService): PostersRouter {
   const createPosterSessionUseCase = new CreatePosterSessionUseCase(postersService);
   const listPosterVersionsUseCase = new ListPosterVersionsUseCase(postersService);
   const downloadPosterPngUseCase = new DownloadPosterPngUseCase(postersService);
+  const downloadPosterPreviewUseCase = new DownloadPosterPreviewUseCase(postersService);
   const deletePosterVersionUseCase = new DeletePosterVersionUseCase(postersService);
   const postersController = new PostersController(
     createPosterSessionUseCase,
     listPosterVersionsUseCase,
     downloadPosterPngUseCase,
+    downloadPosterPreviewUseCase,
     deletePosterVersionUseCase
   );
   return new PostersRouter(postersController);

@@ -88,4 +88,44 @@ export class PostersResource extends ApiResource {
       }
     }
   }
+  async downloadPreviewBlob(versionId: string, options?: { signal?: AbortSignal }): Promise<{ blob: Blob }> {
+    const path = `${this.basePath}/versions/${encodeURIComponent(versionId)}/assets/preview`;
+    const url = joinUrl(this.getBaseUrl(), path);
+    let retried401 = false;
+    while (true) {
+      try {
+        const token = await getAuthToken();
+        const res = await fetch(url, {
+          method: "GET",
+          headers: {
+            Accept: "image/webp",
+            Authorization: `Bearer ${token}`
+          },
+          signal: options?.signal,
+          credentials: "same-origin"
+        });
+        if (res.status === 401 && !retried401 && !options?.signal?.aborted) {
+          retried401 = true;
+          clearAuthToken();
+          continue;
+        }
+        if (!res.ok) {
+          const body = await readJsonOrText(res);
+          throw new ApiHttpError({ status: res.status, message: `HTTP error: ${res.status}`, responseBody: body });
+        }
+        let blob: Blob;
+        try {
+          blob = await res.blob();
+        } catch (e) {
+          throw new ApiParseError("Failed to read blob response body", e);
+        }
+        return { blob };
+      } catch (e) {
+        if (e instanceof ApiHttpError || e instanceof ApiParseError) throw e;
+        if (options?.signal?.aborted) throw new ApiAbortError("Request aborted", e);
+        if (e instanceof Error && e.name === "AbortError") throw new ApiAbortError("Request aborted", e);
+        throw new ApiNetworkError("Network error", e);
+      }
+    }
+  }
 }

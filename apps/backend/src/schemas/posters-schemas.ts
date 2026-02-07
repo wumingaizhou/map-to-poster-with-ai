@@ -36,6 +36,11 @@ export const downloadPosterPngSchema = z.object({
     versionId: z.string().min(1)
   })
 });
+export const downloadPosterPreviewSchema = z.object({
+  params: z.object({
+    versionId: z.string().min(1)
+  })
+});
 export const deletePosterVersionSchema = z.object({
   params: z.object({
     sessionId: z.string().min(1),
