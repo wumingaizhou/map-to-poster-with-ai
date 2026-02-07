@@ -90,19 +90,16 @@ function renderRoadsLayer(options: {
     if (paths.length === 0) continue;
     const style = theme.layers.roads.classes[cls];
     const casing = theme.layers.roads.casing;
+    const combinedD = paths.join(" ");
     if (casing.enabled) {
       const casingWidth = style.strokeWidthPt + casing.strokeWidthAddPt;
-      for (const d of paths) {
-        out.push(
-          `<path${svgAttr("d", d)} fill="none" stroke="${casing.stroke}" stroke-opacity="${casing.opacity}" stroke-width="${casingWidth}" stroke-linecap="${lineCap}" stroke-linejoin="${lineJoin}" />`
-        );
-      }
-    }
-    for (const d of paths) {
       out.push(
-        `<path${svgAttr("d", d)} fill="none" stroke="${style.stroke}" stroke-opacity="${style.opacity}" stroke-width="${style.strokeWidthPt}" stroke-linecap="${lineCap}" stroke-linejoin="${lineJoin}" />`
+        `<path${svgAttr("d", combinedD)} fill="none" stroke="${casing.stroke}" stroke-opacity="${casing.opacity}" stroke-width="${casingWidth}" stroke-linecap="${lineCap}" stroke-linejoin="${lineJoin}" />`
       );
     }
+    out.push(
+      `<path${svgAttr("d", combinedD)} fill="none" stroke="${style.stroke}" stroke-opacity="${style.opacity}" stroke-width="${style.strokeWidthPt}" stroke-linecap="${lineCap}" stroke-linejoin="${lineJoin}" />`
+    );
   }
   return out.join("\n");
 }

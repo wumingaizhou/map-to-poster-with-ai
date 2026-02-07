@@ -11,7 +11,8 @@ export type GetOsmLayeredGeoJsonWithCacheParams = {
   placeKey: string;
   bbox: BBox;
   highwayAllowlist: readonly string[];
-  includeBuildings?: boolean;
+  includeBuildings?: boolean | undefined;
+  maxFeaturesPerLayer?: number | undefined;
 };
 function normalizeAllowlist(values: readonly string[]): string {
   const uniq = new Set(values.map(v => String(v).trim()).filter(Boolean));
@@ -25,30 +26,56 @@ function buildCacheKey(params: GetOsmLayeredGeoJsonWithCacheParams): string {
   const buildingsKey = params.includeBuildings ? "b1" : "b0";
   const allowlistKey = hashShort(normalizeAllowlist(params.highwayAllowlist));
   const bboxKey = hashShort(params.bbox.map(v => Number(v).toFixed(6)).join(","));
-  return `${CACHE_SCHEMA_VERSION}:${placeKey}:${buildingsKey}:a=${allowlistKey}:bb=${bboxKey}`;
+  const maxFeaturesKey = Number.isFinite(params.maxFeaturesPerLayer)
+    ? String(Math.max(0, Math.trunc(params.maxFeaturesPerLayer as number)))
+    : "none";
+  return `${CACHE_SCHEMA_VERSION}:${placeKey}:${buildingsKey}:a=${allowlistKey}:bb=${bboxKey}:mf=${maxFeaturesKey}`;
+}
+function truncateLayers(layers: OsmLayeredGeoJson, maxPerLayer: number): OsmLayeredGeoJson {
+  for (const key of Object.keys(layers) as Array<keyof OsmLayeredGeoJson>) {
+    const fc = layers[key];
+    if (fc.features.length > maxPerLayer) {
+      fc.features.length = maxPerLayer;
+    }
+  }
+  return layers;
 }
 export async function getOsmLayeredGeoJsonWithCache(
   params: GetOsmLayeredGeoJsonWithCacheParams
 ): Promise<OsmLayeredGeoJson> {
   const includeBuildings = params.includeBuildings ?? true;
+  const maxFeatures = params.maxFeaturesPerLayer;
   if (config.osm.cache.maxBytes <= 0) {
-    return fetchOsmLayeredGeoJson({ bbox: params.bbox, highwayAllowlist: params.highwayAllowlist, includeBuildings });
+    const result = await fetchOsmLayeredGeoJson({
+      bbox: params.bbox,
+      highwayAllowlist: params.highwayAllowlist,
+      includeBuildings,
+      maxFeaturesPerLayer: maxFeatures
+    });
+    return maxFeatures ? truncateLayers(result, maxFeatures) : result;
   }
   const cacheKey = buildCacheKey({ ...params, includeBuildings });
   return lock.runExclusive(cacheKey, async () => {
     const cache = getSqliteOsmLayerCache();
     if (!cache) {
-      return fetchOsmLayeredGeoJson({ bbox: params.bbox, highwayAllowlist: params.highwayAllowlist, includeBuildings });
+      const result = await fetchOsmLayeredGeoJson({
+        bbox: params.bbox,
+        highwayAllowlist: params.highwayAllowlist,
+        includeBuildings,
+        maxFeaturesPerLayer: maxFeatures
+      });
+      return maxFeatures ? truncateLayers(result, maxFeatures) : result;
     }
     const cached = await cache.get(cacheKey);
-    if (cached) return cached;
+    if (cached) return maxFeatures ? truncateLayers(cached, maxFeatures) : cached;
     const fresh = await fetchOsmLayeredGeoJson({
       bbox: params.bbox,
       highwayAllowlist: params.highwayAllowlist,
-      includeBuildings
+      includeBuildings,
+      maxFeaturesPerLayer: maxFeatures
     });
     await cache.set(cacheKey, fresh);
     await cache.evictIfNeeded();
-    return fresh;
+    return maxFeatures ? truncateLayers(fresh, maxFeatures) : fresh;
   });
 }

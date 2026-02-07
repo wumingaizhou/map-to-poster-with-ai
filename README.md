@@ -80,6 +80,14 @@ cp apps/frontend/.env.example apps/frontend/.env
 
 - `apps/backend/.env`
   - `AI_EXAMPLE_AGENT_*`：AI 设计助手（可选；不配置也能生成初版海报，但无法使用 AI 对话迭代）
+  - 生产部署注意：
+    - `POSTER_WORKER_POOL_SIZE`：海报 Worker 池大小（并行渲染线程数），默认 1；2G2C 服务器建议 1，4G4C 可设为 2
+    - `POSTER_WORKER_MEMORY_LIMIT_MB`：每个 Worker 最大老生代内存（MB），默认 256；2G2C 建议 256，4G+ 可设为 512
+  - 其他：
+    - `POSTER_MAX_FEATURES_PER_LAYER`：每个图层最大 feature 数量（防止大城市数据爆炸），默认 50000
+    - `GEOCODE_BBOX_CENTER_SCALE`：Geocode bbox 中心点缩放比例，范围 0–1，默认 0.5
+    - `GEOCODE_BBOX_MAX_RADIUS_KM`：Geocode bbox 最大半径（km），用于限制 bbox 范围并降低 OSM 数据量，默认 50
+    - `POSTER_PNG_DPI`：海报导出 PNG 的 DPI，默认 300
 - `apps/frontend/.env`
   - `VITE_DEV_API_PROXY_TARGET`：开发时 API 代理目标（默认 `http://localhost:3000`）
 

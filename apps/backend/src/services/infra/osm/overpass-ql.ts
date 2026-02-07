@@ -17,50 +17,57 @@ export function createHighwayAllowlist(keys: Iterable<string>): string[] {
 export type BuildLayeredOverpassQLParams = {
   bbox: BBox;
   highwayAllowlist: readonly string[];
-  timeoutSeconds?: number;
-  includeBuildings?: boolean;
+  timeoutSeconds?: number | undefined;
+  includeBuildings?: boolean | undefined;
+  maxFeaturesPerLayer?: number | undefined;
 };
 export function buildLayeredOverpassQL(params: BuildLayeredOverpassQLParams): string {
   const bbox = params.bbox;
   const bboxQl = bboxToOverpassQLBbox(bbox);
   const timeoutSeconds = params.timeoutSeconds ?? 25;
   const includeBuildings = params.includeBuildings ?? true;
+  const limit = params.maxFeaturesPerLayer;
   const allowlist = createHighwayAllowlist(params.highwayAllowlist);
   const roadsRegex = allowlist.length ? `^(${allowlist.map(escapeRegexPart).join("|")})$` : null;
+  const outSuffix = limit ? ` ${limit}` : "";
   const lines: string[] = [];
   lines.push(`[out:json][timeout:${timeoutSeconds}];`);
-  const wayQueries: string[] = [];
-  const relationQueries: string[] = [];
-  wayQueries.push(`  way["natural"="water"]${bboxQl};`);
-  relationQueries.push(`  relation["natural"="water"]${bboxQl};`);
-  wayQueries.push(`  way["waterway"="riverbank"]${bboxQl};`);
-  relationQueries.push(`  relation["waterway"="riverbank"]${bboxQl};`);
-  wayQueries.push(`  way["landuse"="reservoir"]${bboxQl};`);
-  relationQueries.push(`  relation["landuse"="reservoir"]${bboxQl};`);
-  wayQueries.push(`  way["leisure"="park"]${bboxQl};`);
-  wayQueries.push(`  way["leisure"="garden"]${bboxQl};`);
-  relationQueries.push(`  relation["leisure"="park"]${bboxQl};`);
-  relationQueries.push(`  relation["leisure"="garden"]${bboxQl};`);
-  wayQueries.push(`  way["natural"="wood"]${bboxQl};`);
-  relationQueries.push(`  relation["natural"="wood"]${bboxQl};`);
-  wayQueries.push(`  way["landuse"~"^(grass|forest|meadow)$"]${bboxQl};`);
-  relationQueries.push(`  relation["landuse"~"^(grass|forest|meadow)$"]${bboxQl};`);
+  // ─── Water ───
+  lines.push("(");
+  lines.push(`  way["natural"="water"]${bboxQl};`);
+  lines.push(`  way["waterway"="riverbank"]${bboxQl};`);
+  lines.push(`  way["landuse"="reservoir"]${bboxQl};`);
+  lines.push(`  relation["natural"="water"]${bboxQl};`);
+  lines.push(`  relation["waterway"="riverbank"]${bboxQl};`);
+  lines.push(`  relation["landuse"="reservoir"]${bboxQl};`);
+  lines.push(");");
+  lines.push(`out geom qt${outSuffix};`);
+  // ─── Parks ───
+  lines.push("(");
+  lines.push(`  way["leisure"="park"]${bboxQl};`);
+  lines.push(`  way["leisure"="garden"]${bboxQl};`);
+  lines.push(`  relation["leisure"="park"]${bboxQl};`);
+  lines.push(`  relation["leisure"="garden"]${bboxQl};`);
+  lines.push(`  way["natural"="wood"]${bboxQl};`);
+  lines.push(`  relation["natural"="wood"]${bboxQl};`);
+  lines.push(`  way["landuse"~"^(grass|forest|meadow)$"]${bboxQl};`);
+  lines.push(`  relation["landuse"~"^(grass|forest|meadow)$"]${bboxQl};`);
+  lines.push(");");
+  lines.push(`out geom qt${outSuffix};`);
+  // ─── Buildings ───
   if (includeBuildings) {
-    wayQueries.push(`  way["building"]${bboxQl};`);
-    relationQueries.push(`  relation["building"]${bboxQl};`);
+    lines.push("(");
+    lines.push(`  way["building"]${bboxQl};`);
+    lines.push(`  relation["building"]${bboxQl};`);
+    lines.push(");");
+    lines.push(`out geom qt${outSuffix};`);
   }
+  // ─── Roads ───
   if (roadsRegex) {
-    wayQueries.push(`  way["highway"~"${roadsRegex}"]${bboxQl};`);
+    lines.push("(");
+    lines.push(`  way["highway"~"${roadsRegex}"]${bboxQl};`);
+    lines.push(");");
+    lines.push(`out tags geom qt${outSuffix};`);
   }
-  lines.push("(");
-  lines.push(...wayQueries);
-  lines.push(")->.ways;");
-  lines.push("(");
-  lines.push(...relationQueries);
-  lines.push(")->.rels;");
-  lines.push("(.ways;);");
-  lines.push("out tags geom qt;");
-  lines.push("(.rels;);");
-  lines.push("out geom qt;");
   return lines.join("\n");
 }

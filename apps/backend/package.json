@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "pnpm -C ../.. exec rollup -c apps/backend/rollup.config.js",
-    "dev": "tsx watch src/index.ts",
-    "start": "node --enable-source-maps dist/index.js",
+    "dev": "node --max-old-space-size=2048 --import tsx --watch src/index.ts",
+    "start": "node --enable-source-maps --max-old-space-size=2048 dist/index.js",
     "mastra:dev": "mastra dev"
   },
   "keywords": [],

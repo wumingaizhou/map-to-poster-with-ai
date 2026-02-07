@@ -12,8 +12,9 @@ export type OverpassConfig = {
 export type FetchOsmLayeredGeoJsonParams = {
   bbox: BBox;
   highwayAllowlist: readonly string[];
-  includeBuildings?: boolean;
-  overpassConfig?: Partial<OverpassConfig>;
+  includeBuildings?: boolean | undefined;
+  maxFeaturesPerLayer?: number | undefined;
+  overpassConfig?: Partial<OverpassConfig> | undefined;
 };
 function emptyFeatureCollection(): GeoJsonFeatureCollection {
   return { type: "FeatureCollection", features: [] };
@@ -126,7 +127,8 @@ export async function fetchOsmLayeredGeoJson(params: FetchOsmLayeredGeoJsonParam
     bbox: clampedBbox,
     highwayAllowlist: params.highwayAllowlist,
     timeoutSeconds,
-    includeBuildings
+    includeBuildings,
+    maxFeaturesPerLayer: params.maxFeaturesPerLayer
   });
   const { data: overpassJson } = await overpassRequest({
     endpoint: overpass.endpoint,

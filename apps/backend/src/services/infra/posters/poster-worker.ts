@@ -1,6 +1,7 @@
 import { parentPort } from "worker_threads";
 import { config } from "../../../config/env";
 import { ThemeNotFoundError, ServiceUnavailableError } from "../../../errors/app-error";
+import { createLogger } from "../../../utils/logger";
 import type { PosterCategory } from "../../../types/posters/poster-category";
 import type { AiThemeOverride } from "../../../types/posters/ai-theme-override";
 import type { BBox } from "../osm/bbox";
@@ -37,6 +38,7 @@ export type WorkerResultMessage =
 const themeRepository = new PosterThemeRepository();
 const themeOverrideService = new ThemeOverrideService();
 const svgRenderer = new PosterSvgRenderer({ projectionMode: config.posters.projectionMode });
+const log = createLogger("PosterWorker");
 function deriveText(displayName: string, bbox: BBox): PosterTextContent {
   const parts = displayName
     .split(",")
@@ -84,10 +86,22 @@ async function handleCreateSession(params: CreateSessionTaskParams): Promise<Buf
     placeKey: params.placeKey,
     bbox: params.bbox,
     highwayAllowlist,
-    includeBuildings
+    includeBuildings,
+    maxFeaturesPerLayer: config.posters.maxFeaturesPerLayer
   });
+  log.info(
+    {
+      place: params.displayName,
+      water: layered.water.features.length,
+      parks: layered.parks.features.length,
+      buildings: layered.buildings.features.length,
+      roads: layered.roads.features.length
+    },
+    "OSM layer feature counts"
+  );
   const text = deriveText(params.displayName, params.bbox);
   const svg = await svgRenderer.render({ bbox: params.bbox, layers: layered, theme: finalTheme, text });
+  log.info({ place: params.displayName, svgSizeKB: Math.round(svg.length / 1024) }, "SVG generated");
   const widthPx = Math.round(finalTheme.page.widthIn * params.pngDpi);
   const heightPx = Math.round(finalTheme.page.heightIn * params.pngDpi);
   return rasterizeSvgToPng({ svg, widthPx, heightPx });
@@ -104,10 +118,22 @@ async function handleIterateStyle(params: IterateStyleTaskParams): Promise<Buffe
     placeKey: params.placeKey,
     bbox: params.bbox,
     highwayAllowlist,
-    includeBuildings
+    includeBuildings,
+    maxFeaturesPerLayer: config.posters.maxFeaturesPerLayer
   });
+  log.info(
+    {
+      place: params.displayName,
+      water: layered.water.features.length,
+      parks: layered.parks.features.length,
+      buildings: layered.buildings.features.length,
+      roads: layered.roads.features.length
+    },
+    "OSM layer feature counts"
+  );
   const text = deriveText(params.displayName, params.bbox);
   const svg = await svgRenderer.render({ bbox: params.bbox, layers: layered, theme: finalTheme, text });
+  log.info({ place: params.displayName, svgSizeKB: Math.round(svg.length / 1024) }, "SVG generated");
   const widthPx = Math.round(finalTheme.page.widthIn * params.pngDpi);
   const heightPx = Math.round(finalTheme.page.heightIn * params.pngDpi);
   return rasterizeSvgToPng({ svg, widthPx, heightPx });
