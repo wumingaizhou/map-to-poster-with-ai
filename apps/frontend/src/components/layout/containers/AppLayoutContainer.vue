@@ -1,16 +1,15 @@
 <script setup lang="ts">
-// ==================== 展示组件 ====================
 import TopBar from "../presentational/TopBar.vue";
 import RightPanel from "../presentational/RightPanel.vue";
 import MobileTopBar from "../presentational/MobileTopBar.vue";
 import MobileDrawer from "../presentational/MobileDrawer.vue";
 
-// ==================== 其他组件 ====================
 import AiChatPanelContainer from "@/components/ai-chat/containers/AiChatPanelContainer.vue";
 import AboutModalContainer from "@/components/common/containers/AboutModalContainer.vue";
+import FAQModalContainer from "@/components/common/containers/FAQModalContainer.vue";
+import FeedbackModalContainer from "@/components/common/containers/FeedbackModalContainer.vue";
 import ErrorBoundary from "@/components/common/atoms/ErrorBoundary.vue";
 
-// ==================== Composables ====================
 import { computed, ref } from "vue";
 import { useLayoutState } from "@/composables/layout/use-layout-state";
 import { useBreakpoints } from "@/composables/layout/use-breakpoints";
@@ -40,15 +39,34 @@ const isMobileRightDrawerActive = computed(
 useScrollLock(isMobileRightDrawerActive);
 useEscapeKey(isMobileRightDrawerActive, closeMobileDrawers);
 
-// AboutModal 状态
 const isAboutModalOpen = ref(false);
+const isFAQModalOpen = ref(false);
+const isFeedbackModalOpen = ref(false);
 
-function handleOpenAbout() {
-  isAboutModalOpen.value = true;
+function handleMenuSelect(key: string) {
+  switch (key) {
+    case "about":
+      isAboutModalOpen.value = true;
+      break;
+    case "faq":
+      isFAQModalOpen.value = true;
+      break;
+    case "feedback":
+      isFeedbackModalOpen.value = true;
+      break;
+  }
 }
 
 function handleCloseAbout() {
   isAboutModalOpen.value = false;
+}
+
+function handleCloseFAQ() {
+  isFAQModalOpen.value = false;
+}
+
+function handleCloseFeedback() {
+  isFeedbackModalOpen.value = false;
 }
 </script>
 
@@ -66,7 +84,7 @@ function handleCloseAbout() {
       v-if="props.showTopbar && !isMobileOrTablet"
       :show-chat-toggle="props.enableRightPanel"
       @toggle-right-panel="toggleRightPanel"
-      @open-about="handleOpenAbout"
+      @menu-select="handleMenuSelect"
     >
       <template #actions>
         <slot name="topbar-actions" />
@@ -78,7 +96,7 @@ function handleCloseAbout() {
       v-else-if="props.showTopbar && isMobileOrTablet"
       :show-chat-toggle="props.enableRightPanel"
       @toggle-chat="toggleRightPanel"
-      @open-about="handleOpenAbout"
+      @menu-select="handleMenuSelect"
     >
       <template #actions>
         <slot name="topbar-actions" />
@@ -133,5 +151,15 @@ function handleCloseAbout() {
   <!-- 关于弹窗 -->
   <ErrorBoundary>
     <AboutModalContainer :is-open="isAboutModalOpen" @close="handleCloseAbout" />
+  </ErrorBoundary>
+
+  <!-- 常见问题弹窗 -->
+  <ErrorBoundary>
+    <FAQModalContainer :is-open="isFAQModalOpen" @close="handleCloseFAQ" />
+  </ErrorBoundary>
+
+  <!-- 意见反馈弹窗 -->
+  <ErrorBoundary>
+    <FeedbackModalContainer :is-open="isFeedbackModalOpen" @close="handleCloseFeedback" />
   </ErrorBoundary>
 </template>

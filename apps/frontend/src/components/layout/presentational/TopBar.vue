@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AppLogo from "../atoms/AppLogo.vue";
 import ChatToggleButton from "../atoms/ChatToggleButton.vue";
-import AboutButton from "@/components/common/atoms/AboutButton.vue";
+import TopBarMenu from "./TopBarMenu.vue";
 
 withDefaults(
   defineProps<{
@@ -14,7 +14,7 @@ withDefaults(
 
 const emit = defineEmits<{
   "toggle-right-panel": [];
-  "open-about": [];
+  "menu-select": [key: string];
 }>();
 </script>
 
@@ -38,7 +38,7 @@ const emit = defineEmits<{
     <!-- 右侧区域 -->
     <div class="flex items-center gap-2">
       <slot name="actions" />
-      <AboutButton @click="emit('open-about')" />
+      <TopBarMenu size="md" @select="(key: string) => emit('menu-select', key)" />
     </div>
   </header>
 </template>

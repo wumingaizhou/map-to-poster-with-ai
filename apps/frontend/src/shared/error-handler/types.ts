@@ -1,4 +1,4 @@
-export type ErrorLevel = "error" | "warning" | "info";
+export type ErrorLevel = "error" | "warning" | "info" | "success";
 export enum ErrorCategory {
   NETWORK = "network",
   BUSINESS = "business",

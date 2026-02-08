@@ -35,6 +35,9 @@ class ToastService {
       case "info":
         this.messageApi.info(message, messageOptions);
         break;
+      case "success":
+        this.messageApi.success(message, messageOptions);
+        break;
       default:
         this.messageApi.info(message, messageOptions);
     }
@@ -47,6 +50,9 @@ class ToastService {
   }
   info(message: string, duration?: number): void {
     this.show({ message, level: "info", duration });
+  }
+  success(message: string, duration?: number): void {
+    this.show({ message, level: "success", duration });
   }
 }
 export const toastService = new ToastService();

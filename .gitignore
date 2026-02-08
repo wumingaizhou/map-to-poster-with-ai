@@ -60,6 +60,7 @@ openspec/
 
 # backend artifacts
 apps/backend/poster-assets/
+apps/backend/data/
 apps/backend/__test__/artifacts/
 osm-cache.db
 poster-worker.dev.mjs

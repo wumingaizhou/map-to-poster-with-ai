@@ -26,6 +26,10 @@ import { AiChatRouter } from "./routes/business/ai-chat-router";
 import { ThemesRouter } from "./routes/business/themes-router";
 import { GeocodeRouter } from "./routes/business/geocode-router";
 import { PostersRouter } from "./routes/business/posters-router";
+import { FeedbackRouter } from "./routes/business/feedback-router";
+import { FeedbackService } from "./services/business/feedback-service";
+import { SubmitFeedbackUseCase } from "./usecases/business/feedback/submit-feedback-usecase";
+import { FeedbackController } from "./controllers/business/feedback-controller";
 import { PosterThemeRepository } from "./services/infra/theme/poster-theme-repository";
 import { NominatimClient } from "./services/infra/geocoding/nominatim-client";
 import { postersRuntime } from "./runtime/posters-runtime";
@@ -73,6 +77,12 @@ function createPostersRouter(postersService: PostersService): PostersRouter {
   );
   return new PostersRouter(postersController);
 }
+function createFeedbackRouter(): FeedbackRouter {
+  const feedbackService = new FeedbackService();
+  const submitFeedbackUseCase = new SubmitFeedbackUseCase(feedbackService);
+  const feedbackController = new FeedbackController(submitFeedbackUseCase);
+  return new FeedbackRouter(feedbackController);
+}
 async function start(): Promise<void> {
   if (config.isProduction && !config.ai.exampleAgent.apiKey) {
     log.error(
@@ -100,7 +110,8 @@ async function start(): Promise<void> {
   const themesRouter = createThemesRouter(postersRuntime.themeRepository);
   const geocodeRouter = createGeocodeRouter();
   const postersRouter = createPostersRouter(postersRuntime.postersService);
-  app = new App([authRouter, aiChatRouter, themesRouter, geocodeRouter, postersRouter]);
+  const feedbackRouter = createFeedbackRouter();
+  app = new App([authRouter, aiChatRouter, themesRouter, geocodeRouter, postersRouter, feedbackRouter]);
   const port = config.port;
   app.listen(port);
   log.info({ port }, "Backend started");

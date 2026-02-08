@@ -6,6 +6,7 @@ import { PosterAlphaService } from "@/api/data-services/posters/poster-alpha-ser
 import { GeocodeResource } from "@/api/api-resources/geocode/geocode-resource";
 import { ThemesResource } from "@/api/api-resources/themes/themes-resource";
 import { PostersResource } from "@/api/api-resources/posters/posters-resource";
+import { FeedbackResource } from "@/api/api-resources/feedback/feedback-resource";
 export function createAiChatService(client: ApiClient = defaultApiClient): AiChatService {
   const resource = new AiChatResource(client);
   return new AiChatService(resource);
@@ -18,3 +19,7 @@ export function createPosterAlphaService(client: ApiClient = defaultApiClient): 
   return new PosterAlphaService(geocodeResource, themesResource, postersResource);
 }
 export const posterAlphaService = createPosterAlphaService();
+export function createFeedbackResource(client: ApiClient = defaultApiClient): FeedbackResource {
+  return new FeedbackResource(client);
+}
+export const feedbackResource = createFeedbackResource();

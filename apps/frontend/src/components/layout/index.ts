@@ -9,6 +9,7 @@ export { default as TopBar } from "./presentational/TopBar.vue";
 export { default as MobileTopBar } from "./presentational/MobileTopBar.vue";
 export { default as RightPanel } from "./presentational/RightPanel.vue";
 export { default as MobileDrawer } from "./presentational/MobileDrawer.vue";
+export { default as TopBarMenu } from "./presentational/TopBarMenu.vue";
 
 // ==================== 原子组件 ====================
 export { default as AppLogo } from "./atoms/AppLogo.vue";
