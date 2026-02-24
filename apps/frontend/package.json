@@ -15,23 +15,23 @@
   },
   "dependencies": {
     "@panzoom/panzoom": "^4.6.1",
-    "@tailwindcss/vite": "^4.1.17",
+    "@tailwindcss/vite": "^4.2.1",
     "file-saver": "^2.0.5",
-    "markstream-vue": "0.0.7-beta.5",
+    "markstream-vue": "0.0.7-beta.9",
     "photoswipe": "^5.4.4",
     "pinia": "^3.0.4",
-    "rollup-plugin-visualizer": "^6.0.5",
-    "tailwindcss": "^4.1.17",
+    "rollup-plugin-visualizer": "^7.0.0",
+    "tailwindcss": "^4.2.1",
     "uuid": "^13.0.0",
     "vite-plugin-compression": "^0.5.1",
-    "vue": "^3.5.27",
-    "vue-router": "^5.0.2",
+    "vue": "^3.5.28",
+    "vue-router": "^5.0.3",
     "zod": "^3.25.76"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.4",
     "@types/file-saver": "^2.0.7",
-    "@types/node": "^25.2.0",
+    "@types/node": "^25.3.0",
     "@vitejs/plugin-vue": "^6.0.4",
     "@vue/tsconfig": "^0.8.1",
     "naive-ui": "^2.43.2",
@@ -41,6 +41,6 @@
     "unplugin-vue-components": "^31.0.0",
     "vite": "^7.3.1",
     "vite-plugin-vue-devtools": "^8.0.6",
-    "vue-tsc": "^3.2.2"
+    "vue-tsc": "^3.2.5"
   }
 }

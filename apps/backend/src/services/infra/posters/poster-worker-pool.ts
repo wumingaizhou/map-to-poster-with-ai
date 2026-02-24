@@ -51,7 +51,14 @@ function resolveWorkerPath(): string {
   if (fs.existsSync(jsPath)) return jsPath;
   const tsPath = path.join(thisDir, "poster-worker.ts");
   if (fs.existsSync(tsPath)) return compileWorkerDev(tsPath);
-  throw new Error(`Worker script not found. Searched:\n  ${jsPath}\n  ${tsPath}`);
+
+  // Fallback for mastra dev environment where output is in .mastra/output
+  // Try to find the source file relative to the project root
+  // Assuming .mastra/output is 2 levels deep from project root (apps/backend)
+  const fallbackTsPath = path.resolve(thisDir, "../../src/services/infra/posters/poster-worker.ts");
+  if (fs.existsSync(fallbackTsPath)) return compileWorkerDev(fallbackTsPath);
+
+  throw new Error(`Worker script not found. Searched:\n  ${jsPath}\n  ${tsPath}\n  ${fallbackTsPath}`);
 }
 function reconstructError(serialized: { message: string; statusCode: number; code?: string }): AppError {
   return new AppError(serialized.message, serialized.statusCode, serialized.code);
