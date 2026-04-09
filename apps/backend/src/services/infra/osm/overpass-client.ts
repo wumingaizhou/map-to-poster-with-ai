@@ -1,5 +1,5 @@
 import { OverpassClientError } from "./errors";
-export const DEFAULT_OVERPASS_ENDPOINT = "https://maps.mail.ru/osm/tools/overpass/api/interpreter";
+export const DEFAULT_OVERPASS_ENDPOINT = "https://overpass-api.de/api/interpreter";
 export type OverpassRequestOptions = {
   query: string;
   timeoutMs: number;
