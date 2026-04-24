@@ -173,7 +173,12 @@ export class ApiClient {
             return options.schema.parse(responseContext.body) as T;
           } catch (e) {
             if (e instanceof ZodError) {
-              throw new ApiValidationError("Response validation failed", e.errors, responseContext.body);
+              const formattedErrors = e.issues.map((issue) => ({
+                code: issue.code,
+                message: issue.message,
+                path: issue.path.filter((p): p is string | number => typeof p === "string" || typeof p === "number"),
+              }));
+              throw new ApiValidationError("Response validation failed", formattedErrors, responseContext.body);
             }
             throw e;
           }
