@@ -62,7 +62,7 @@ export function validate(schema: ZodSchema<ValidationSource>): RequestHandler {
   };
 }
 function formatZodErrors(error: ZodError): ValidationErrorDetail[] {
-  return error.errors.map(err => ({
+  return error.issues.map(err => ({
     field: err.path.join("."),
     message: err.message
   }));

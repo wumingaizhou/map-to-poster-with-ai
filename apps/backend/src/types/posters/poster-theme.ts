@@ -44,7 +44,7 @@ const zRoadsLayer = z.object({
     medium: zRoadClassStyle,
     minor: zRoadClassStyle
   }),
-  mapping: z.record(zRoadClass),
+  mapping: z.record(z.string(), zRoadClass),
   defaultClass: zRoadClass
 });
 const zGradientFades = z.object({
@@ -125,7 +125,7 @@ export const posterThemeSchema = z
     description: z.string().min(1),
     category: z.enum(POSTER_CATEGORIES),
     page: zPosterPage,
-    palette: z.record(zHexColor),
+    palette: z.record(z.string(), zHexColor),
     background: z.object({
       fill: zMaybeTokenOrHex
     }),

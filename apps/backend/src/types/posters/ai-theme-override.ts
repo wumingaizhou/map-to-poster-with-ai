@@ -51,7 +51,7 @@ export const aiThemeOverrideSchema = z
     kind: z.literal("aiThemeOverride"),
     version: z.number().int().finite(),
     baseThemeId: z.string().min(1),
-    palette: z.record(zHexColor).optional(),
+    palette: z.record(z.string(), zHexColor).optional(),
     tuning: z
       .object({
         gradientFades: zGradientFadesTuning.optional(),
@@ -66,7 +66,7 @@ export const aiThemeOverrideSchema = z
 export type AiThemeOverride = z.infer<typeof aiThemeOverrideSchema>;
 export const aiThemePatchSchema = z
   .object({
-    palette: z.record(zHexColor).optional(),
+    palette: z.record(z.string(), zHexColor).optional(),
     tuning: z
       .object({
         gradientFades: zGradientFadesTuning.optional(),
