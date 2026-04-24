@@ -90,8 +90,6 @@ const envSchema = z.object({
   RUNTIME_ASSETS_DIR: z.preprocess(val => (val === "" ? undefined : val), z.string().min(1).optional()),
   POSTER_ASSETS_DIR: z.preprocess(val => (val === "" ? undefined : val), z.string().min(1).optional()),
   POSTER_PNG_DPI: intFromEnv(300, { min: 1 }),
-  POSTER_WORKER_POOL_SIZE: intFromEnv(1, { min: 1 }),
-  POSTER_WORKER_MEMORY_LIMIT_MB: intFromEnv(256, { min: 1 }),
   POSTER_MAX_FEATURES_PER_LAYER: intFromEnv(50000, { min: 100 }),
   POSTER_PROJECTION_MODE: z.preprocess(
     val => (val === "" ? undefined : val),
@@ -148,8 +146,6 @@ export const config = {
       dpi: env.POSTER_PNG_DPI
     },
     projectionMode: env.POSTER_PROJECTION_MODE,
-    workerPoolSize: env.POSTER_WORKER_POOL_SIZE,
-    workerMemoryLimitMb: env.POSTER_WORKER_MEMORY_LIMIT_MB,
     maxFeaturesPerLayer: env.POSTER_MAX_FEATURES_PER_LAYER
   },
   cors: {

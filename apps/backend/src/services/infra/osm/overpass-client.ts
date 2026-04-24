@@ -1,5 +1,14 @@
 import { OverpassClientError } from "./errors";
+import { createLogger } from "../../../utils/logger";
 export const DEFAULT_OVERPASS_ENDPOINT = "https://overpass-api.de/api/interpreter";
+
+const OVERPASS_MIN_REQUEST_INTERVAL_MS = 2500;
+const OVERPASS_DEFAULT_RATE_LIMIT_COOLDOWN_MS = 30000;
+const OVERPASS_USER_AGENT =
+  "map-to-poster-with-ai/1.0 (+https://maptoposter.cc.cd/; https://github.com/wumingaizhou/map-to-poster-with-ai)";
+const OVERPASS_REFERER = "https://maptoposter.cc.cd/";
+const log = createLogger("Infra:OverpassClient");
+
 export type OverpassRequestOptions = {
   query: string;
   timeoutMs: number;
@@ -15,9 +24,18 @@ export type OverpassRequestResult<TData> = {
   data: TData;
   meta: OverpassRequestMeta;
 };
+
+type EndpointThrottleState = {
+  lastRequestStartedAt: number;
+  cooldownUntil: number;
+};
+
+const throttleStateByEndpoint = new Map<string, EndpointThrottleState>();
+
 function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
 function computeBackoffMs(retryIndex: number): number {
   const baseMs = 250;
   const maxMs = 5000;
@@ -39,15 +57,68 @@ function parseRetryAfterMs(value: string | null): number | null {
   }
   return null;
 }
+
+function getThrottleState(endpoint: string): EndpointThrottleState {
+  const existing = throttleStateByEndpoint.get(endpoint);
+  if (existing) return existing;
+  const created: EndpointThrottleState = { lastRequestStartedAt: 0, cooldownUntil: 0 };
+  throttleStateByEndpoint.set(endpoint, created);
+  return created;
+}
+
+function createRateLimitError(endpoint: string, retryAfterMs: number, status: number = 429): OverpassClientError {
+  return new OverpassClientError({
+    code: "OVERPASS_RATE_LIMITED",
+    message: `Overpass rate limited (HTTP ${status})`,
+    retriable: true,
+    endpoint,
+    status,
+    retryAfterMs
+  });
+}
+
+function setEndpointCooldown(endpoint: string, cooldownMs: number): number {
+  const now = Date.now();
+  const retryAfterMs = Math.max(0, Math.ceil(cooldownMs));
+  const state = getThrottleState(endpoint);
+  state.cooldownUntil = Math.max(state.cooldownUntil, now + retryAfterMs);
+  return Math.max(0, state.cooldownUntil - now);
+}
+
+async function applyEndpointThrottle(endpoint: string): Promise<void> {
+  while (true) {
+    const state = getThrottleState(endpoint);
+    const now = Date.now();
+    const cooldownWaitMs = Math.max(0, state.cooldownUntil - now);
+    const intervalWaitMs = Math.max(0, state.lastRequestStartedAt + OVERPASS_MIN_REQUEST_INTERVAL_MS - now);
+    const waitMs = Math.max(0, cooldownWaitMs, intervalWaitMs);
+    if (waitMs > 0) {
+      log.warn(
+        {
+          endpoint,
+          waitMs,
+          cooldownWaitMs,
+          intervalWaitMs,
+          reason:
+            cooldownWaitMs > 0 && intervalWaitMs > 0
+              ? "cooldown_and_min_interval"
+              : cooldownWaitMs > 0
+                ? "cooldown"
+                : "min_interval"
+        },
+        "Overpass request throttled, waiting before next attempt"
+      );
+      await sleep(waitMs);
+      continue;
+    }
+    state.lastRequestStartedAt = Date.now();
+    return;
+  }
+}
+
 function toHttpError(status: number, endpoint: string): OverpassClientError {
   if (status === 429) {
-    return new OverpassClientError({
-      code: "OVERPASS_RATE_LIMITED",
-      message: `Overpass rate limited (HTTP ${status})`,
-      retriable: true,
-      endpoint,
-      status
-    });
+    return createRateLimitError(endpoint, OVERPASS_DEFAULT_RATE_LIMIT_COOLDOWN_MS, status);
   }
   return new OverpassClientError({
     code: "OVERPASS_HTTP_ERROR",
@@ -77,7 +148,7 @@ function toNetworkError(error: unknown, endpoint: string): OverpassClientError {
   });
 }
 function shouldRetry(error: unknown): error is OverpassClientError {
-  return error instanceof OverpassClientError && error.retriable;
+  return error instanceof OverpassClientError && error.retriable && error.code !== "OVERPASS_RATE_LIMITED";
 }
 export async function overpassRequest<TData = unknown>(
   options: OverpassRequestOptions
@@ -114,6 +185,17 @@ export async function overpassRequest<TData = unknown>(
   const startTime = Date.now();
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
+      await applyEndpointThrottle(endpoint);
+      log.info(
+        {
+          endpoint,
+          attempt,
+          maxAttempts,
+          timeoutMs,
+          queryLength: query.length
+        },
+        "Starting Overpass request attempt"
+      );
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), timeoutMs);
       try {
@@ -122,19 +204,45 @@ export async function overpassRequest<TData = unknown>(
           method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-            Accept: "application/json"
+            Accept: "application/json",
+            "User-Agent": OVERPASS_USER_AGENT,
+            Referer: OVERPASS_REFERER
           },
           body,
           signal: controller.signal
         });
-        if (res.status === 429 && attempt < maxAttempts) {
+        if (res.status === 429) {
           const retryAfterMs = parseRetryAfterMs(res.headers.get("Retry-After"));
-          const waitMs = Math.min(15_000, retryAfterMs ?? computeBackoffMs(attempt - 1));
+          const cooldownMs = setEndpointCooldown(endpoint, retryAfterMs ?? OVERPASS_DEFAULT_RATE_LIMIT_COOLDOWN_MS);
           await res.arrayBuffer();
-          await sleep(waitMs);
-          continue;
+          log.warn(
+            {
+              endpoint,
+              attempt,
+              maxAttempts,
+              status: res.status,
+              retryAfterMs,
+              cooldownMs
+            },
+            "Overpass responded with rate limit"
+          );
+          if (attempt < maxAttempts) {
+            continue;
+          }
+          throw createRateLimitError(endpoint, cooldownMs, 429);
         }
         if (!res.ok) {
+          const responseSnippet = (await res.text()).slice(0, 500);
+          log.warn(
+            {
+              endpoint,
+              attempt,
+              maxAttempts,
+              status: res.status,
+              responseSnippet
+            },
+            "Overpass returned non-success HTTP status"
+          );
           throw toHttpError(res.status, endpoint);
         }
         let data: unknown;
@@ -172,12 +280,22 @@ export async function overpassRequest<TData = unknown>(
             cause: error
           });
         }
+        const durationMs = Date.now() - startTime;
+        log.info(
+          {
+            endpoint,
+            attempt,
+            maxAttempts,
+            durationMs
+          },
+          "Overpass request completed successfully"
+        );
         return {
           data: data as TData,
           meta: {
             endpoint,
             attempts: attempt,
-            durationMs: Date.now() - startTime
+            durationMs
           }
         };
       } finally {
@@ -187,9 +305,35 @@ export async function overpassRequest<TData = unknown>(
       const normalized = error instanceof OverpassClientError ? error : toNetworkError(error, endpoint);
       if (attempt < maxAttempts && shouldRetry(normalized)) {
         const retryIndex = attempt - 1;
-        await sleep(computeBackoffMs(retryIndex));
+        const retryInMs = computeBackoffMs(retryIndex);
+        log.warn(
+          {
+            endpoint,
+            attempt,
+            maxAttempts,
+            code: normalized.code,
+            message: normalized.message,
+            status: normalized.status,
+            retryInMs
+          },
+          "Overpass request attempt failed, scheduling retry"
+        );
+        await sleep(retryInMs);
         continue;
       }
+      log.warn(
+        {
+          endpoint,
+          attempt,
+          maxAttempts,
+          code: normalized.code,
+          message: normalized.message,
+          status: normalized.status,
+          retryAfterMs: normalized.retryAfterMs,
+          totalDurationMs: Date.now() - startTime
+        },
+        "Overpass request failed"
+      );
       throw normalized;
     }
   }

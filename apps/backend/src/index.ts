@@ -104,7 +104,7 @@ async function start(): Promise<void> {
     },
     "Runtime config loaded"
   );
-  await postersRuntime.workerPool.init();
+  await postersRuntime.posterRenderer.warmup();
   const authRouter = createAuthRouter();
   const aiChatRouter = createAiChatRouter();
   const themesRouter = createThemesRouter(postersRuntime.themeRepository);
@@ -132,7 +132,6 @@ async function shutdown(reason: string, error?: unknown): Promise<void> {
     const currentApp = app;
     app = null;
     await currentApp?.close();
-    await postersRuntime.workerPool.terminate();
   } catch (closeError) {
     log.error({ error: closeError }, "Error during shutdown");
   } finally {

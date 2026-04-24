@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
-import typescript from "rollup-plugin-typescript2";
+import typescript from "@rollup/plugin-typescript";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,12 +26,7 @@ const sharedPlugins = [
   commonjs(),
   typescript({
     tsconfig: path.resolve(__dirname, "tsconfig.build.json"),
-    useTsconfigDeclarationDir: true,
-    tsconfigOverride: {
-      compilerOptions: {
-        sourceMap: true
-      }
-    }
+    sourceMap: true
   })
 ];
 
@@ -40,16 +35,6 @@ export default [
     input: path.resolve(__dirname, "src/index.ts"),
     output: {
       file: path.resolve(__dirname, "dist/index.js"),
-      format: "esm",
-      sourcemap: true
-    },
-    external: isExternal,
-    plugins: sharedPlugins
-  },
-  {
-    input: path.resolve(__dirname, "src/services/infra/posters/poster-worker.ts"),
-    output: {
-      file: path.resolve(__dirname, "dist/poster-worker.js"),
       format: "esm",
       sourcemap: true
     },

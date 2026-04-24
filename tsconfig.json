@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
     "module": "esnext",
     "target": "esnext",
     "types": ["vitest/globals", "@vitest/browser/matchers"],

@@ -83,13 +83,14 @@ Key variables to configure:
 - `apps/backend/.env`
   - `AI_EXAMPLE_AGENT_*`: AI design assistant (optional; posters can still be generated without it, but AI conversation iteration won't be available)
   - Production deployment notes:
-    - `POSTER_WORKER_POOL_SIZE`: Worker pool size for poster rendering (parallel threads), default 1; recommended 1 for 2G2C servers, 2 for 4G4C
-    - `POSTER_WORKER_MEMORY_LIMIT_MB`: Max old-generation memory per worker (MB), default 256; recommended 256 for 2G2C, 512 for 4G+
+    - Poster rendering runs on the main thread in serialized mode
+    - Oversized outputs are rejected by a built-in safety budget before rasterization
   - Others:
     - `POSTER_MAX_FEATURES_PER_LAYER`: Max features per layer (prevents data explosion for large cities), default 50000
     - `GEOCODE_BBOX_CENTER_SCALE`: Geocode bbox center scale ratio, range 0–1, default 0.5
     - `GEOCODE_BBOX_MAX_RADIUS_KM`: Geocode bbox max radius (km), limits bbox range and reduces OSM data volume, default 50
     - `POSTER_PNG_DPI`: Poster export PNG DPI, default 300
+    - Small servers should tune `POSTER_PNG_DPI` and `POSTER_MAX_FEATURES_PER_LAYER` first
 - `apps/frontend/.env`
   - `VITE_DEV_API_PROXY_TARGET`: Dev API proxy target (default `http://localhost:3000`)
 

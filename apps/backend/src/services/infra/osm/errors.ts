@@ -10,6 +10,7 @@ export type OverpassClientErrorParams = {
   retriable: boolean;
   endpoint: string;
   status?: number;
+  retryAfterMs?: number;
   cause?: unknown;
 };
 export class OverpassClientError extends Error {
@@ -17,6 +18,7 @@ export class OverpassClientError extends Error {
   public readonly retriable: boolean;
   public readonly endpoint: string;
   public readonly status?: number;
+  public readonly retryAfterMs?: number;
   constructor(params: OverpassClientErrorParams) {
     super(params.message, params.cause !== undefined ? { cause: params.cause } : undefined);
     this.name = "OverpassClientError";
@@ -25,6 +27,9 @@ export class OverpassClientError extends Error {
     this.endpoint = params.endpoint;
     if (params.status !== undefined) {
       this.status = params.status;
+    }
+    if (params.retryAfterMs !== undefined) {
+      this.retryAfterMs = params.retryAfterMs;
     }
   }
 }

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
 import { AppError } from "../errors/app-error";
+import { OverpassClientError } from "../services/infra/osm/errors";
 import { createLogger } from "../utils/logger";
 import { config } from "../config/env";
 const log = createLogger("ErrorHandler");
@@ -22,6 +23,23 @@ export function asyncHandler(
 }
 export function globalErrorHandler(err: Error, req: Request, res: Response, _next: NextFunction): void {
   if (res.headersSent) {
+    return;
+  }
+  if (err instanceof OverpassClientError) {
+    if (err.retryAfterMs !== undefined && err.retryAfterMs > 0) {
+      res.setHeader("Retry-After", String(Math.max(1, Math.ceil(err.retryAfterMs / 1000))));
+    }
+    const response: ErrorResponse = {
+      success: false,
+      error: {
+        message: err.message,
+        code: err.code,
+        recoverable: err.retriable,
+        ...(err.retryAfterMs !== undefined ? { details: { retryAfterMs: err.retryAfterMs } } : {})
+      },
+      timestamp: new Date().toISOString()
+    };
+    res.status(503).json(response);
     return;
   }
   if (err instanceof AppError) {

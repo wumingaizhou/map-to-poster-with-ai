@@ -109,3 +109,5 @@ rels
 Respawning
 TTFB
 respawned
+COOLDOWN
+cooldown

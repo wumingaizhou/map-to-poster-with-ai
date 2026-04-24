@@ -5,7 +5,7 @@ import { clampBboxToMaxSpan, assertValidBBox, type BBox } from "../infra/osm/bbo
 import type { PosterAssetStore } from "../infra/posters/poster-asset-store";
 import type { CreatePosterSessionParams, PosterSessionStore } from "../infra/posters/poster-session-store";
 import { KeyedLock } from "../infra/posters/keyed-lock";
-import type { PosterWorkerPool } from "../infra/posters/poster-worker-pool";
+import type { PosterRenderer } from "../infra/posters/poster-renderer";
 import { generatePreviewWebp } from "../infra/posters/png-to-preview";
 import { ThemeOverrideService } from "./theme-override-service";
 export type CreatePosterSessionRequestDTO = {
@@ -77,7 +77,7 @@ export class PostersService {
   private readonly lock = new KeyedLock();
   constructor(
     private readonly themeOverrideService: ThemeOverrideService,
-    private readonly workerPool: PosterWorkerPool,
+    private readonly posterRenderer: PosterRenderer,
     private readonly sessionStore: PosterSessionStore,
     private readonly assetStore: PosterAssetStore,
     private readonly pngDpi: number
@@ -87,8 +87,7 @@ export class PostersService {
     const bboxClamped = clampBboxToMaxSpan(bboxValidated, 15);
     const placeKey = buildPlaceKey(req);
     return this.lock.runExclusive(`${resourceId}:${req.category}:${placeKey}`, async () => {
-      const png = await this.workerPool.execute({
-        taskType: "createSession",
+      const png = await this.posterRenderer.createSessionPng({
         bbox: bboxClamped,
         placeKey,
         baseThemeId: req.baseThemeId,
@@ -166,8 +165,7 @@ export class PostersService {
         previousOverride: latestVersion.aiThemeOverride
       });
       const placeKey = buildPlaceKey(session);
-      const png = await this.workerPool.execute({
-        taskType: "iterateStyle",
+      const png = await this.posterRenderer.iterateStylePng({
         bbox: session.bbox,
         placeKey,
         baseThemeId: session.baseThemeId,
